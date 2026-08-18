@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAgentStream } from "@/lib/useAgentStream";
 import { ActivityLog } from "./ActivityLog";
+import { AgentAnswer } from "./AgentAnswer";
 
 /**
  * HLAVNÝ interaktívny prvok appky: voľné textové pole, kde návštevník napíše
@@ -59,12 +60,7 @@ export function AskAgent() {
 
       <ActivityLog steps={steps} running={running} />
 
-      {finalText && (
-        <div className="agent-answer">
-          <div className="agent-answer-label">Odpoveď agenta</div>
-          <div className="agent-answer-text">{finalText}</div>
-        </div>
-      )}
+      {finalText && <AgentAnswer label="Odpoveď agenta" text={finalText} />}
     </div>
   );
 }

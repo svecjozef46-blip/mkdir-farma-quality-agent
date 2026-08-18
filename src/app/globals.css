@@ -150,10 +150,31 @@ a.row-link:hover { text-decoration: underline; }
 .activity-error .activity-icon { color: #f85149; }
 .activity-detail { color: #6e7681; font-size: 11px; margin-top: 2px; margin-left: 20px; word-break: break-all; }
 
-.agent-answer { margin-top: 14px; background: var(--blue-bg); border: 1px solid #cfe0f5; border-radius: 8px; padding: 12px 14px; }
-.agent-answer-label { font-size: 11px; text-transform: uppercase; letter-spacing: .03em; color: var(--blue-ink); font-weight: 700; margin-bottom: 6px; }
-.agent-answer-text { font-size: 13.5px; color: var(--ink); white-space: pre-wrap; }
-.agent-answer-pre { font-family: inherit; margin: 0; }
+.agent-answer { margin-top: 14px; background: var(--blue-bg); border: 1px solid #cfe0f5; border-radius: 8px; padding: 14px 16px; }
+.agent-answer-label { font-size: 11px; text-transform: uppercase; letter-spacing: .03em; color: var(--blue-ink); font-weight: 700; margin-bottom: 8px; }
+
+/* Vykreslený Markdown z odpovede agenta (mesačná správa, kategorizácia, odpoveď na otázku) -
+   namiesto surového textu s viditeľnými ## a ** dostane appka skutočné nadpisy a zoznamy. */
+.agent-answer-markdown { font-size: 13.5px; color: var(--ink); line-height: 1.6; }
+.agent-answer-markdown > *:first-child { margin-top: 0; }
+.agent-answer-markdown > *:last-child { margin-bottom: 0; }
+.agent-answer-markdown h1, .agent-answer-markdown h2, .agent-answer-markdown h3 {
+  color: var(--navy); font-weight: 700; margin: 14px 0 6px; text-transform: none; letter-spacing: normal;
+}
+.agent-answer-markdown h1 { font-size: 16px; }
+.agent-answer-markdown h2 { font-size: 14.5px; }
+.agent-answer-markdown h3 { font-size: 13.5px; }
+.agent-answer-markdown p { margin: 0 0 10px; }
+.agent-answer-markdown ul, .agent-answer-markdown ol { margin: 0 0 10px; padding-left: 20px; }
+.agent-answer-markdown li { margin-bottom: 4px; }
+.agent-answer-markdown strong { color: var(--navy); font-weight: 700; }
+.agent-answer-markdown code {
+  background: rgba(31,56,100,0.08); padding: 1px 5px; border-radius: 4px;
+  font-family: "Consolas", "SFMono-Regular", monospace; font-size: 12px;
+}
+.agent-answer-markdown blockquote {
+  border-left: 3px solid var(--blue); margin: 0 0 10px; padding: 2px 12px; color: var(--ink-secondary);
+}
 
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 6px; }
 .detail-item .label { font-size: 11px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .03em; margin-bottom: 2px; }

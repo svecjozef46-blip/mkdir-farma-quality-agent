@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { SeverityBadge, StatusBadge, OverdueBadge } from "@/components/Badges";
 import { ActivityLog } from "@/components/ActivityLog";
+import { AgentAnswer } from "@/components/AgentAnswer";
 import { useAgentStream } from "@/lib/useAgentStream";
 import type { AiInsight, CapaAction, Deviation } from "@/lib/types";
 
@@ -59,12 +60,7 @@ export default function DeviationDetailPage({ params }: { params: { id: string }
         </div>
 
         <ActivityLog steps={steps} running={running} />
-        {finalText && (
-          <div className="agent-answer">
-            <div className="agent-answer-label">Výsledok analýzy</div>
-            <div className="agent-answer-text">{finalText}</div>
-          </div>
-        )}
+        {finalText && <AgentAnswer label="Výsledok analýzy" text={finalText} />}
       </div>
 
       <div className="card">
@@ -105,9 +101,11 @@ export default function DeviationDetailPage({ params }: { params: { id: string }
         <div className="card">
           <h3>História AI analýz</h3>
           {insights.map((ins) => (
-            <div key={ins.id} className="agent-answer" style={{ marginBottom: 10 }}>
-              <div className="agent-answer-label">{ins.insight_type} · {new Date(ins.created_at).toLocaleString("sk-SK")}</div>
-              <div className="agent-answer-text">{ins.content}</div>
+            <div key={ins.id} style={{ marginBottom: 10 }}>
+              <AgentAnswer
+                label={`${ins.insight_type} · ${new Date(ins.created_at).toLocaleString("sk-SK")}`}
+                text={ins.content}
+              />
             </div>
           ))}
         </div>

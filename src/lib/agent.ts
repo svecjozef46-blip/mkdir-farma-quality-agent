@@ -28,6 +28,12 @@ export async function* runAgent(
 
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: userMessage }];
 
+  // Claude часто napíše samotnú odpoveď v TOM ISTOM kole, v ktorom aj zavolá write_insight
+  // (text + tool_use v jednej správe) - v takom kole stop_reason je "tool_use", takže by sme
+  // text zahodili, ak by sme za "finálnu odpoveď" považovali len text z posledného kola.
+  // Preto zbierame text zo VŠETKÝCH kôl a na konci ich spojíme - odpoveď sa tak nikdy nestratí.
+  const answerParts: string[] = [];
+
   yield { type: "thinking", text: "Agent prijal zadanie, rozhoduje, ktoré dáta potrebuje..." };
 
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
@@ -54,12 +60,13 @@ export async function* runAgent(
 
     for (const t of textBlocks) {
       if (t.text.trim()) {
+        answerParts.push(t.text.trim());
         yield { type: "thinking", text: t.text.trim() };
       }
     }
 
     if (response.stop_reason !== "tool_use" || toolUseBlocks.length === 0) {
-      const finalText = textBlocks.map((b) => b.text).join("\n").trim();
+      const finalText = answerParts.join("\n\n").trim();
       yield { type: "final", text: finalText || "Agent neposkytol textovú odpoveď." };
       return;
     }

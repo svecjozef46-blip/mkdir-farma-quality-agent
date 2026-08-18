@@ -2,6 +2,7 @@
 
 import { useAgentStream } from "@/lib/useAgentStream";
 import { ActivityLog } from "./ActivityLog";
+import { AgentAnswer } from "./AgentAnswer";
 
 export function MonthlyReportButton() {
   const { steps, running, finalText, run } = useAgentStream("/api/agent/monthly-report");
@@ -15,12 +16,7 @@ export function MonthlyReportButton() {
         </button>
       </div>
       <ActivityLog steps={steps} running={running} />
-      {finalText && (
-        <div className="agent-answer">
-          <div className="agent-answer-label">Správa</div>
-          <pre className="agent-answer-text agent-answer-pre">{finalText}</pre>
-        </div>
-      )}
+      {finalText && <AgentAnswer label="Správa" text={finalText} />}
     </div>
   );
 }
