@@ -1,0 +1,70 @@
+"use client";
+
+import { useState } from "react";
+import { useAgentStream } from "@/lib/useAgentStream";
+import { ActivityLog } from "./ActivityLog";
+
+/**
+ * HLAVNÝ interaktívny prvok appky: voľné textové pole, kde návštevník napíše
+ * ĽUBOVOĽNÚ otázku o odchýlkach/CAPA a agent na ňu reálne odpovie cez tool use.
+ * Nie sú tu žiadne preddefinované tlačidlá s pevnými otázkami.
+ */
+export function AskAgent() {
+  const [question, setQuestion] = useState("");
+  const { steps, running, finalText, run } = useAgentStream("/api/agent/ask");
+
+  const examples = [
+    "ktoré produkty majú najviac kritických odchýlok?",
+    "ktoré oddelenie má najviac oneskorených CAPA akcií?",
+    "aký je pomer uzavretých a otvorených odchýlok?",
+  ];
+
+  return (
+    <div className="card ask-agent">
+      <h3>Opýtaj sa agenta</h3>
+      <p className="muted">
+        Napíš ľubovoľnú otázku o odchýlkach alebo CAPA akciách - agent si sám dotiahne relevantné dáta z databázy.
+      </p>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!question.trim() || running) return;
+          run({ question });
+        }}
+      >
+        <textarea
+          className="ask-input"
+          placeholder="Napr. ktoré produkty majú najviac kritických odchýlok?"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          rows={2}
+        />
+        <button type="submit" className="btn btn-primary" disabled={running || !question.trim()}>
+          {running ? "Agent pracuje..." : "Opýtať sa agenta"}
+        </button>
+      </form>
+      <div className="examples">
+        {examples.map((ex) => (
+          <button
+            key={ex}
+            type="button"
+            className="chip"
+            disabled={running}
+            onClick={() => setQuestion(ex)}
+          >
+            {ex}
+          </button>
+        ))}
+      </div>
+
+      <ActivityLog steps={steps} running={running} />
+
+      {finalText && (
+        <div className="agent-answer">
+          <div className="agent-answer-label">Odpoveď agenta</div>
+          <div className="agent-answer-text">{finalText}</div>
+        </div>
+      )}
+    </div>
+  );
+}
