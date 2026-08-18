@@ -8,13 +8,22 @@ import ReactMarkdown from "react-markdown";
  * (najmä mesačná správa podľa skills/capa-monthly-report/SKILL.md) píše v Markdowne -
  * toto ho vyrenderuje na skutočné nadpisy, tučné písmo a zoznamy.
  */
-export function AgentAnswer({ label, text }: { label: string; text: string }) {
+export function AgentAnswer({
+  label,
+  text,
+  children,
+}: {
+  label: string;
+  text: string;
+  children?: React.ReactNode;
+}) {
   return (
     <div className="agent-answer">
       <div className="agent-answer-label">{label}</div>
       <div className="agent-answer-markdown">
         <ReactMarkdown>{text}</ReactMarkdown>
       </div>
+      {children}
     </div>
   );
 }

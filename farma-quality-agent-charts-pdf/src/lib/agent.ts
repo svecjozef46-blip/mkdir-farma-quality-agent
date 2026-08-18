@@ -85,14 +85,29 @@ export async function* runAgent(
       try {
         const result = await executeTool(call.name, call.input);
         const count = Array.isArray(result) ? result.length : 1;
-        yield {
-          type: call.name === "write_insight" ? "write" : "tool_result",
-          text:
-            call.name === "write_insight"
-              ? "Zapísané do ai_insights."
-              : `Výsledok: ${count} záznam(ov).`,
-          detail: JSON.stringify(result).slice(0, 4000),
-        };
+
+        // Nástroje submit_* a show_* nesú štruktúrované dáta pre frontend (mesačná správa,
+        // graf) - appka ich vie priamo vykresliť namiesto toho, aby ich musela parsovať z textu.
+        const isStructured = call.name.startsWith("submit_") || call.name.startsWith("show_");
+
+        if (isStructured) {
+          yield {
+            type: "structured",
+            text: call.name === "submit_monthly_report" ? "Mesačná správa zostavená." : "Graf pripravený.",
+            structuredKind: call.name,
+            data: result,
+          };
+        } else {
+          yield {
+            type: call.name === "write_insight" ? "write" : "tool_result",
+            text:
+              call.name === "write_insight"
+                ? "Zapísané do ai_insights."
+                : `Výsledok: ${count} záznam(ov).`,
+            detail: JSON.stringify(result).slice(0, 4000),
+          };
+        }
+
         toolResults.push({
           type: "tool_result",
           tool_use_id: call.id,
@@ -124,6 +139,7 @@ export const SYSTEM_PROMPT = `Si "Quality Deviation & CAPA Insight Agent" - AI a
 Pravidlá:
 - Dáta si VŽDY over cez dostupné nástroje (tools). Nikdy si nevymýšľaj čísla, ID ani obsah záznamov.
 - Buď stručný a konkrétny, píš po slovensky.
-- Ak generuješ mesačnú správu alebo kategorizáciu, na záver VŽDY zavolaj nástroj write_insight, aby zostal záznam v databáze.
-- Pri odpovedi na voľnú otázku používateľa si najprv sám over, ktoré nástroje/dáta potrebuješ - neodpovedaj len z všeobecných znalostí o farma/QMS procesoch, odpoveď musí byť podložená skutočnými dátami z tejto databázy.
+- Pri kategorizácii jednej odchýlky alebo odpovedi na voľnú otázku na záver zavolaj write_insight, aby zostal záznam v databáze.
+- Pri generovaní MESAČNEJ SPRÁVY: over si dáta cez get_deviations (spočítaj presne total/critical/major/minor/closed/open a top_causes) a NEZAVOLAJ write_insight - namiesto toho na záver zavolaj submit_monthly_report so spočítanými číslami. Zoznam CAPA po termíne appka dopočíta sama, neposielaj ho.
+- Pri odpovedi na voľnú otázku používateľa si najprv sám over, ktoré nástroje/dáta potrebuješ - neodpovedaj len z všeobecných znalostí o farma/QMS procesoch, odpoveď musí byť podložená skutočnými dátami z tejto databázy. Ak odpoveď porovnáva čísla naprieč kategóriami (napr. podľa produktu, oddelenia), zváž aj zavolanie show_chart, aby appka popri texte zobrazila aj graf.
 - Ak dáta na zodpovedanie otázky neexistujú alebo je otázka mimo rozsah (deviations/CAPA), povedz to úprimne namiesto vymýšľania.`;

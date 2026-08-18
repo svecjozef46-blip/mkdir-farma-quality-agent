@@ -13,12 +13,16 @@ export function useAgentStream(url: string) {
   const [steps, setSteps] = useState<ActivityStep[]>([]);
   const [running, setRunning] = useState(false);
   const [finalText, setFinalText] = useState<string | null>(null);
+  // Štruktúrované dáta zo "submit_*"/"show_*" nástrojov, podľa structuredKind
+  // (napr. "submit_monthly_report" -> MonthlyReportData, "show_chart" -> ChartData).
+  const [structured, setStructured] = useState<Record<string, unknown>>({});
   const abortRef = useRef<AbortController | null>(null);
 
   const run = useCallback(
     async (body: unknown) => {
       setSteps([]);
       setFinalText(null);
+      setStructured({});
       setRunning(true);
 
       const controller = new AbortController();
@@ -52,6 +56,10 @@ export function useAgentStream(url: string) {
               const step: ActivityStep = JSON.parse(line);
               setSteps((prev) => [...prev, step]);
               if (step.type === "final") setFinalText(step.text);
+              if (step.type === "structured" && step.structuredKind) {
+                const kind = step.structuredKind;
+                setStructured((prev) => ({ ...prev, [kind]: step.data }));
+              }
             } catch {
               // ignoruj nekompletný/poškodený riadok
             }
@@ -66,5 +74,5 @@ export function useAgentStream(url: string) {
     [url]
   );
 
-  return { steps, running, finalText, run };
+  return { steps, running, finalText, structured, run };
 }

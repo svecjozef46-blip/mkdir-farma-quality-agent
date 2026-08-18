@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     return new Response(JSON.stringify({ type: "error", text: "Chýba otázka." }), { status: 400 });
   }
 
-  const userMessage = `Používateľ sa pýta (voľná otázka, nie preddefinovaný scenár): "${question.trim()}"\n\nOver si potrebné dáta cez nástroje a odpovedz. Ak je vhodné, na záver zavolaj write_insight s related_table='deviations' (alebo 'capa_actions'), related_id='ALL', insight_type='qa_answer'.`;
+  const userMessage = `Používateľ sa pýta (voľná otázka, nie preddefinovaný scenár): "${question.trim()}"\n\nOver si potrebné dáta cez nástroje a odpovedz. Ak odpoveď porovnáva čísla naprieč kategóriami, zváž aj zavolanie show_chart. Na záver zavolaj write_insight s related_table='deviations' (alebo 'capa_actions'), related_id='ALL', insight_type='qa_answer'.`;
 
   const gen = runAgent(SYSTEM_PROMPT, userMessage);
   return new Response(toNdjsonStream(gen), {

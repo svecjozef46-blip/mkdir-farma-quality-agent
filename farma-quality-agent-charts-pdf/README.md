@@ -9,9 +9,9 @@ zvyčajne píšu ručne.
 ## Riešenie
 Appka je demo prototyp AI agenta, ktorý nad Supabase databázou:
 - zobrazuje dashboard odchýlok a CAPA akcií s farebným označením podľa závažnosti/statusu a zvýraznením akcií po termíne,
-- na tlačidlo vygeneruje mesačnú súhrnnú správu (trendy, najčastejšie príčiny, CAPA po termíne, odporúčania),
+- na tlačidlo vygeneruje mesačnú súhrnnú správu (stat prehľad, graf najčastejších príčin, prehľadná tabuľka CAPA po termíne s presným počtom dní omeškania, odporúčania) a vie ju exportovať ako PDF na stiahnutie,
 - na tlačidlo pri konkrétnej odchýlke overí/spresní jej kategóriu príčiny,
-- odpovedá na ĽUBOVOĽNÚ voľnú otázku používateľa o dátach cez pole "Opýtaj sa agenta",
+- odpovedá na ĽUBOVOĽNÚ voľnú otázku používateľa o dátach cez pole "Opýtaj sa agenta", a keď to dáva zmysel (napr. porovnanie naprieč kategóriami), pridá k odpovedi aj jemný stĺpcový graf,
 - pri každom spustení agenta ukazuje v reálnom čase "Agent Activity Log" - presne to, ktoré nástroje agent volá a s akým výsledkom, ako dôkaz viackrokovej agentovej (tool use) logiky, nie len jedného AI textu.
 
 **Dôležité:** appka beží na 100 % fiktívnych dátach fiktívnej firmy. Je to portfóliové
@@ -19,10 +19,13 @@ demo, nie produkčný QMS systém pre reálnu firmu.
 
 ## Tech stack
 Next.js 14 (App Router, TypeScript), Supabase (Postgres + JS klient), oficiálny
-Anthropic TypeScript SDK s tool use (`claude-sonnet-4-5`). Voliteľné rozšírenie:
-logika mesačnej správy je zabalená ako Agent Skill (`skills/capa-monthly-report/SKILL.md`)
-- agent si ho pri generovaní správy sám načíta a použije ako inštrukcie, namiesto
-toho aby bol celý postup napevno zapísaný v kóde appky.
+Anthropic TypeScript SDK s tool use (`claude-sonnet-4-5`), `@react-pdf/renderer`
+na PDF export mesačnej správy priamo na serveri appky (bez potreby prehliadača/Puppeteer).
+Voliteľné rozšírenie: logika mesačnej správy je zabalená ako Agent Skill
+(`skills/capa-monthly-report/SKILL.md`) - agent si ho pri generovaní správy sám
+načíta a použije ako inštrukcie, namiesto toho aby bol celý postup napevno
+zapísaný v kóde appky. Číselné údaje (súčty, počty dní po termíne) appka vždy
+nezávisle prepočíta z databázy - nikdy sa nespolieha len na aritmetiku modelu.
 
 ## Ako appku spustiť
 

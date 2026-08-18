@@ -8,6 +8,7 @@ const ICONS: Record<ActivityStep["type"], string> = {
   tool_call: "→",
   tool_result: "←",
   write: "✓",
+  structured: "▤",
   final: "★",
   error: "✕",
 };

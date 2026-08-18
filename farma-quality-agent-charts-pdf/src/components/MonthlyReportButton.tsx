@@ -2,10 +2,12 @@
 
 import { useAgentStream } from "@/lib/useAgentStream";
 import { ActivityLog } from "./ActivityLog";
-import { AgentAnswer } from "./AgentAnswer";
+import { MonthlyReportView } from "./MonthlyReportView";
+import type { MonthlyReportData } from "@/lib/types";
 
 export function MonthlyReportButton() {
-  const { steps, running, finalText, run } = useAgentStream("/api/agent/monthly-report");
+  const { steps, running, structured, run } = useAgentStream("/api/agent/monthly-report");
+  const report = structured["submit_monthly_report"] as MonthlyReportData | undefined;
 
   return (
     <div className="card">
@@ -16,7 +18,7 @@ export function MonthlyReportButton() {
         </button>
       </div>
       <ActivityLog steps={steps} running={running} />
-      {finalText && <AgentAnswer label="Správa" text={finalText} />}
+      {report && <MonthlyReportView report={report} />}
     </div>
   );
 }

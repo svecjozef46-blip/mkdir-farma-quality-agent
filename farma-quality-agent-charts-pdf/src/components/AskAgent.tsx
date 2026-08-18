@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useAgentStream } from "@/lib/useAgentStream";
 import { ActivityLog } from "./ActivityLog";
 import { AgentAnswer } from "./AgentAnswer";
+import { BarChart } from "./BarChart";
+import type { ChartData } from "@/lib/types";
 
 /**
  * HLAVNÝ interaktívny prvok appky: voľné textové pole, kde návštevník napíše
@@ -12,7 +14,8 @@ import { AgentAnswer } from "./AgentAnswer";
  */
 export function AskAgent() {
   const [question, setQuestion] = useState("");
-  const { steps, running, finalText, run } = useAgentStream("/api/agent/ask");
+  const { steps, running, finalText, structured, run } = useAgentStream("/api/agent/ask");
+  const chart = structured["show_chart"] as ChartData | undefined;
 
   const examples = [
     "ktoré produkty majú najviac kritických odchýlok?",
@@ -60,7 +63,11 @@ export function AskAgent() {
 
       <ActivityLog steps={steps} running={running} />
 
-      {finalText && <AgentAnswer label="Odpoveď agenta" text={finalText} />}
+      {finalText && (
+        <AgentAnswer label="Odpoveď agenta" text={finalText}>
+          {chart && <BarChart title={chart.title} data={chart.data} />}
+        </AgentAnswer>
+      )}
     </div>
   );
 }
