@@ -11,7 +11,9 @@ import type { AiInsight, CapaAction, Deviation } from "@/lib/types";
 export default function DeviationDetailPage({ params }: { params: { id: string } }) {
   const [data, setData] = useState<{ deviation: Deviation; capaActions: CapaAction[]; insights: AiInsight[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dismissed, setDismissed] = useState(false);
   const { steps, running, finalText, run } = useAgentStream("/api/agent/categorize");
+  const hasOutput = !dismissed && (steps.length > 0 || running);
 
   useEffect(() => {
     fetch(`/api/deviations/${params.id}`)
@@ -44,7 +46,14 @@ export default function DeviationDetailPage({ params }: { params: { id: string }
       <div className="card" style={{ marginTop: 12 }}>
         <div className="card-header-row">
           <h1 style={{ margin: 0 }}>{deviation.deviation_id}</h1>
-          <button className="btn btn-primary" disabled={running} onClick={() => run({ deviation_id: deviation.deviation_id })}>
+          <button
+            className="btn btn-primary"
+            disabled={running}
+            onClick={() => {
+              setDismissed(false);
+              run({ deviation_id: deviation.deviation_id });
+            }}
+          >
             {running ? "Analyzujem..." : "Analyzuj agentom"}
           </button>
         </div>
@@ -59,8 +68,17 @@ export default function DeviationDetailPage({ params }: { params: { id: string }
           <div className="detail-item"><div className="label">Dátum otvorenia / uzavretia</div><div className="value">{deviation.date_opened} {deviation.date_closed ? `→ ${deviation.date_closed}` : ""}</div></div>
         </div>
 
-        <ActivityLog steps={steps} running={running} />
-        {finalText && <AgentAnswer label="Výsledok analýzy" text={finalText} />}
+        {hasOutput && (
+          <>
+            <div className="output-close-row">
+              <button type="button" className="btn btn-secondary btn-close-output" onClick={() => setDismissed(true)}>
+                ✕ Zavrieť výstup
+              </button>
+            </div>
+            <ActivityLog steps={steps} running={running} />
+            {finalText && <AgentAnswer label="Výsledok analýzy" text={finalText} />}
+          </>
+        )}
       </div>
 
       <div className="card">

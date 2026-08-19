@@ -134,6 +134,19 @@ a.row-link:hover { text-decoration: underline; }
   letter-spacing: .05em; padding: 8px 12px; display: flex; align-items: center; gap: 8px;
   font-family: "Consolas", "SFMono-Regular", monospace;
 }
+.activity-log-toggle {
+  width: 100%; border: 0; justify-content: space-between; cursor: pointer;
+  font: inherit; text-transform: inherit; letter-spacing: inherit;
+}
+.activity-log-toggle:disabled { cursor: default; }
+.activity-log-title { display: flex; align-items: center; gap: 8px; }
+.activity-log-caret {
+  color: #58a6ff; font-size: 10.5px; text-transform: none; letter-spacing: normal;
+}
+.activity-log-toggle:hover:not(:disabled) .activity-log-caret { color: #79c0ff; }
+
+.output-close-row { display: flex; justify-content: flex-end; margin-top: 10px; }
+.btn-close-output { font-size: 12px; padding: 6px 11px; }
 .pulse-dot {
   width: 7px; height: 7px; border-radius: 50%; background: #3fb950;
   animation: pulse 1.2s infinite;

@@ -14,8 +14,10 @@ import type { ChartData } from "@/lib/types";
  */
 export function AskAgent() {
   const [question, setQuestion] = useState("");
+  const [dismissed, setDismissed] = useState(false);
   const { steps, running, finalText, structured, run } = useAgentStream("/api/agent/ask");
   const chart = structured["show_chart"] as ChartData | undefined;
+  const hasOutput = !dismissed && (steps.length > 0 || running);
 
   const examples = [
     "ktoré produkty majú najviac kritických odchýlok?",
@@ -33,6 +35,7 @@ export function AskAgent() {
         onSubmit={(e) => {
           e.preventDefault();
           if (!question.trim() || running) return;
+          setDismissed(false);
           run({ question });
         }}
       >
@@ -61,12 +64,22 @@ export function AskAgent() {
         ))}
       </div>
 
-      <ActivityLog steps={steps} running={running} />
+      {hasOutput && (
+        <>
+          <div className="output-close-row">
+            <button type="button" className="btn btn-secondary btn-close-output" onClick={() => setDismissed(true)}>
+              ✕ Zavrieť výstup
+            </button>
+          </div>
 
-      {finalText && (
-        <AgentAnswer label="Odpoveď agenta" text={finalText}>
-          {chart && <BarChart title={chart.title} data={chart.data} />}
-        </AgentAnswer>
+          <ActivityLog steps={steps} running={running} />
+
+          {finalText && (
+            <AgentAnswer label="Odpoveď agenta" text={finalText}>
+              {chart && <BarChart title={chart.title} data={chart.data} />}
+            </AgentAnswer>
+          )}
+        </>
       )}
     </div>
   );
